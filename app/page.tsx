@@ -4,11 +4,15 @@ import { HeroSection } from "@/components/sections/hero-section";
 import { HowItWorksSection } from "@/components/sections/howitworks-section";
 import { FeaturesSection } from "@/components/sections/features-section";
 import { TestimonialsSection } from "@/components/sections/testimonials-section";
+import { FooterSection } from "@/components/sections/footer-section";
 import { motion } from "framer-motion";
+import { SignupSection } from "@/components/sections/signup-section";
+import { MainNav } from "@/components/navigation/main-nav";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center">
+        <MainNav />
       <motion.main
         className="w-full"
         initial={{ opacity: 0 }}
@@ -40,6 +44,23 @@ export default function Home() {
         >
           <TestimonialsSection />
         </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <SignupSection />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <FooterSection />
+        </motion.div>
+        
       </motion.main>
     </div>
   );

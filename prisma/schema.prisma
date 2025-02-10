@@ -1,14 +1,79 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "mysql" // PlanetScale uses MySQL
+  url      = env("DATABASE_URL_NON_SSL") // Use an environment variable for security
+  relationMode = "prisma"
+}
+
+enum UserRole {
+  ARTIST
+  PROMOTER
+}
+
+enum CampaignStatus {
+  DRAFT
+  SENT
+}
+
+enum RecipientCategory {
+  YOUTUBE
+  BLOG
+  ANR
+}
+
+enum SubmissionStatus {
+  NEW
+  REVIEWED
+}
+
+model User {
+  id       String   @id @default(uuid())
+  role     UserRole
+  email    String   @unique
+  password String?  // Nullable for OAuth users
+  credits  Int      @default(0) // Used by artists
+
+  campaigns   Campaign[]   @relation("ArtistCampaigns")
+  submissions Submissions[] @relation("ArtistSubmissions", fields: [id], references: [artistId])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Campaign {
+  id        String          @id @default(uuid())
+  user      User            @relation("ArtistCampaigns", fields: [userId], references: [id])
+  userId    String
+  subject   String
+  body      String
+  status    CampaignStatus  @default(DRAFT)
+  recipients Recipients[]   @relation("CampaignRecipients")
+
+  createdAt DateTime @default(now())
+}
+
+model Recipients {
+  id          String            @id @default(uuid())
+  campaign    Campaign          @relation("CampaignRecipients", fields: [campaignId], references: [id])
+  campaignId  String
+  name        String
+  email       String
+  category    RecipientCategory
+
+  createdAt   DateTime @default(now())
+}
+
+model Submissions {
+  id         String            @id @default(uuid())
+  promoter   User              @relation("PromoterSubmissions", fields: [promoterId], references: [id])
+  promoterId String
+  artist     User              @relation("ArtistSubmissions", fields: [artistId], references: [id])
+  artistId   String
+  trackLink  String
+  status     SubmissionStatus  @default(NEW)
+
+  createdAt  DateTime @default(now())
 }
